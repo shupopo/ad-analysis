@@ -5,659 +5,417 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>クリエイティブ別 CPLレポート</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
-    background: #f0f2f5;
-    color: #1a1a2e;
-    display: flex;
-    min-height: 100vh;
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP',sans-serif;background:#f0f2f5;color:#1a1a2e;display:flex;min-height:100vh}
 
-  .sidebar {
-    width: 260px;
-    background: #1a1a2e;
-    color: #fff;
-    padding: 24px 0;
-    position: fixed;
-    top: 0; left: 0;
-    height: 100vh;
-    overflow-y: auto;
-    z-index: 10;
-  }
-  .sidebar-title {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: rgba(255,255,255,0.4);
-    padding: 0 20px;
-    margin-bottom: 16px;
-  }
-  .sidebar-logo {
-    font-size: 1.1rem;
-    font-weight: 700;
-    padding: 0 20px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    margin-bottom: 20px;
-  }
-  .nav-item {
-    display: flex;
-    align-items: center;
-    padding: 14px 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border-left: 3px solid transparent;
-    gap: 12px;
-  }
-  .nav-item:hover { background: rgba(255,255,255,0.05); }
-  .nav-item.active {
-    background: rgba(102,126,234,0.15);
-    border-left-color: #667eea;
-  }
-  .nav-item .nav-name { font-size: 0.88rem; font-weight: 500; line-height: 1.3; }
-  .nav-item .nav-cpl { font-size: 0.75rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
-  .nav-item.active .nav-cpl { color: #a8b4ff; }
-  .nav-badge {
-    font-size: 0.7rem;
-    background: rgba(102,126,234,0.3);
-    color: #a8b4ff;
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-left: auto;
-    white-space: nowrap;
-  }
+/* Sidebar */
+.sidebar{width:270px;background:#1a1a2e;color:#fff;padding:20px 0;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:10}
+.sidebar-logo{font-size:1.1rem;font-weight:700;padding:0 18px 16px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:4px}
+.sidebar-section{padding:14px 18px 6px;font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.35);cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+.sidebar-section::before{content:"▸";font-size:.6rem;transition:transform .2s}
+.sidebar-section.open::before{transform:rotate(90deg)}
+.nav-group{overflow:hidden;max-height:0;transition:max-height .3s ease}
+.nav-group.open{max-height:600px}
+.nav-item{display:flex;align-items:center;padding:11px 18px;cursor:pointer;transition:all .15s;border-left:3px solid transparent;gap:10px}
+.nav-item:hover{background:rgba(255,255,255,0.05)}
+.nav-item.active{background:rgba(102,126,234,0.15);border-left-color:#667eea}
+.nav-item .nav-name{font-size:.82rem;font-weight:500;line-height:1.3}
+.nav-item .nav-cpl{font-size:.7rem;color:rgba(255,255,255,0.4);margin-top:1px}
+.nav-item.active .nav-cpl{color:#a8b4ff}
+.nav-badge{font-size:.65rem;background:rgba(102,126,234,0.3);color:#a8b4ff;padding:2px 7px;border-radius:10px;margin-left:auto;white-space:nowrap}
 
-  .main { margin-left: 260px; flex: 1; padding: 32px; }
-  .container { max-width: 1000px; margin: 0 auto; }
-  h1 { font-size: 1.5rem; margin-bottom: 6px; }
-  .subtitle { color: #666; font-size: 0.88rem; margin-bottom: 28px; }
-
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    margin-bottom: 28px;
-  }
-  .kpi-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  }
-  .kpi-card.highlight {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: #fff;
-  }
-  .kpi-card.highlight .kpi-label { color: rgba(255,255,255,0.8); }
-  .kpi-label {
-    font-size: 0.72rem;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    margin-bottom: 6px;
-  }
-  .kpi-value { font-size: 1.7rem; font-weight: 700; }
-  .kpi-sub { font-size: 0.75rem; margin-top: 3px; opacity: 0.65; }
-
-  .section {
-    background: #fff;
-    border-radius: 12px;
-    padding: 22px;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  }
-  .section h2 {
-    font-size: 1.05rem;
-    margin-bottom: 14px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #f0f2f5;
-  }
-  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-  th {
-    text-align: left;
-    padding: 9px 10px;
-    background: #f8f9fa;
-    font-weight: 600;
-    font-size: 0.75rem;
-    color: #555;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-  }
-  td { padding: 9px 10px; border-top: 1px solid #f0f2f5; }
-  tr:hover td { background: #fafbfc; }
-  .num { text-align: right; font-variant-numeric: tabular-nums; }
-
-  .bar-container { display: flex; align-items: center; gap: 8px; }
-  .bar {
-    height: 7px; border-radius: 4px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
-    min-width: 2px;
-  }
-  .bar.light { background: linear-gradient(90deg, #a8edea, #fed6e3); }
-  .bar-label { font-size: 0.75rem; color: #999; white-space: nowrap; }
-
-  .note-box {
-    background: #fff8e1;
-    border-left: 4px solid #ffc107;
-    border-radius: 0 8px 8px 0;
-    padding: 14px 18px;
-    margin-bottom: 24px;
-    font-size: 0.84rem;
-    line-height: 1.6;
-    color: #6d5a00;
-  }
-
-  .cpl-hero {
-    text-align: center;
-    padding: 24px 0 28px;
-  }
-  .cpl-hero .value {
-    font-size: 3.2rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    transition: opacity 0.2s;
-  }
-  .cpl-hero .label-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 6px;
-  }
-  .cpl-hero .label-text { font-size: 0.88rem; color: #888; }
-  .period-select {
-    font-size: 0.82rem;
-    padding: 4px 10px;
-    border: 1.5px solid #d0d0d0;
-    border-radius: 8px;
-    background: #fff;
-    color: #333;
-    cursor: pointer;
-    font-weight: 600;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .period-select:hover, .period-select:focus { border-color: #667eea; }
-
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .has-ad { background: #f0ebff !important; }
-  .cpl-cell { font-weight: 700; color: #764ba2; }
-  .no-data { color: #ccc; }
-
-  .monthly-chart {
-    display: flex; align-items: flex-end; gap: 10px; height: 160px; padding: 12px 0;
-  }
-  .month-bar-group {
-    flex: 1; display: flex; flex-direction: column;
-    align-items: center; height: 100%; justify-content: flex-end;
-  }
-  .month-bar {
-    width: 100%; max-width: 56px;
-    background: linear-gradient(180deg, #667eea, #764ba2);
-    border-radius: 5px 5px 0 0; min-height: 3px;
-  }
-  .month-bar-value { font-size: 0.8rem; font-weight: 700; color: #333; margin-bottom: 5px; }
-  .month-label { font-size: 0.7rem; color: #888; margin-top: 6px; }
-
-  .page { display: none; }
-  .page.active { display: block; }
-
-  @media (max-width: 900px) {
-    .sidebar { width: 200px; }
-    .main { margin-left: 200px; }
-    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    .two-col { grid-template-columns: 1fr; }
-  }
+/* Main */
+.main{margin-left:270px;flex:1;padding:28px 32px}
+.container{max-width:1020px;margin:0 auto}
+h1{font-size:1.45rem;margin-bottom:5px}
+.subtitle{color:#666;font-size:.85rem;margin-bottom:24px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.kpi-card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.kpi-card.highlight{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+.kpi-card.highlight .kpi-label{color:rgba(255,255,255,.8)}
+.kpi-label{font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.kpi-value{font-size:1.6rem;font-weight:700}
+.kpi-sub{font-size:.72rem;margin-top:2px;opacity:.65}
+.section{background:#fff;border-radius:12px;padding:20px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.section h2{font-size:1rem;margin-bottom:12px;padding-bottom:7px;border-bottom:2px solid #f0f2f5}
+table{width:100%;border-collapse:collapse;font-size:.83rem}
+th{text-align:left;padding:8px 9px;background:#f8f9fa;font-weight:600;font-size:.72rem;color:#555;text-transform:uppercase;letter-spacing:.3px}
+td{padding:8px 9px;border-top:1px solid #f0f2f5}
+tr:hover td{background:#fafbfc}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.bar-container{display:flex;align-items:center;gap:7px}
+.bar{height:7px;border-radius:4px;background:linear-gradient(90deg,#667eea,#764ba2);min-width:2px}
+.bar.light{background:linear-gradient(90deg,#a8edea,#fed6e3)}
+.bar-label{font-size:.72rem;color:#999;white-space:nowrap}
+.note-box{background:#fff8e1;border-left:4px solid #ffc107;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:20px;font-size:.82rem;line-height:1.6;color:#6d5a00}
+.cpl-hero{text-align:center;padding:20px 0 24px}
+.cpl-hero .value{font-size:3rem;font-weight:800;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cpl-hero .label-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:5px}
+.cpl-hero .label-text{font-size:.85rem;color:#888}
+.period-select{font-size:.8rem;padding:4px 10px;border:1.5px solid #d0d0d0;border-radius:8px;background:#fff;color:#333;cursor:pointer;font-weight:600;outline:none}
+.period-select:hover,.period-select:focus{border-color:#667eea}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.has-ad{background:#f0ebff !important}
+.cpl-cell{font-weight:700;color:#764ba2}
+.no-data{color:#ccc}
+.monthly-chart{display:flex;align-items:flex-end;gap:10px;height:150px;padding:10px 0}
+.month-bar-group{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end}
+.month-bar{width:100%;max-width:52px;background:linear-gradient(180deg,#667eea,#764ba2);border-radius:5px 5px 0 0;min-height:3px}
+.month-bar-value{font-size:.78rem;font-weight:700;color:#333;margin-bottom:4px}
+.month-label{font-size:.68rem;color:#888;margin-top:5px}
+.page{display:none}
+.page.active{display:block}
+.cr-table tr.total-row td{font-weight:700;background:#f8f9fa;border-top:2px solid #e0e0e0}
+@media(max-width:900px){.sidebar{width:200px}.main{margin-left:200px}.kpi-grid{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
 <nav class="sidebar">
   <div class="sidebar-logo">CPL レポート</div>
-  <div class="sidebar-title">クリエイティブ一覧</div>
-  <div class="nav-item active" onclick="showPage('cr1', this)">
-    <div><div class="nav-name">50代でもスタートできる</div><div class="nav-cpl">CPL ¥143</div></div>
-    <span class="nav-badge">182件</span>
+
+  <div class="sidebar-section open" onclick="toggleGroup(this)">クリエイティブ一覧</div>
+  <div class="nav-group open">
+    <div class="nav-item active" onclick="showPage('cr1',this)"><div><div class="nav-name">50代でもスタートできる</div><div class="nav-cpl">CPL ¥143</div></div><span class="nav-badge">182件</span></div>
+    <div class="nav-item" onclick="showPage('cr2',this)"><div><div class="nav-name">インタビューかずみさん</div><div class="nav-cpl">CPL ¥84</div></div><span class="nav-badge">34件</span></div>
+    <div class="nav-item" onclick="showPage('cr3',this)"><div><div class="nav-name">知識ゼロでも叶う</div><div class="nav-cpl">CPL ¥64</div></div><span class="nav-badge">4件</span></div>
+    <div class="nav-item" onclick="showPage('cr4',this)"><div><div class="nav-name">日本一簡単な株式投資</div><div class="nav-cpl">CPL ¥173</div></div><span class="nav-badge">230件</span></div>
   </div>
-  <div class="nav-item" onclick="showPage('cr2', this)">
-    <div><div class="nav-name">インタビューかずみさん</div><div class="nav-cpl">CPL ¥84</div></div>
-    <span class="nav-badge">34件</span>
-  </div>
-  <div class="nav-item" onclick="showPage('cr3', this)">
-    <div><div class="nav-name">知識ゼロでも叶う</div><div class="nav-cpl">CPL ¥64</div></div>
-    <span class="nav-badge">4件</span>
-  </div>
-  <div class="nav-item" onclick="showPage('cr4', this)">
-    <div><div class="nav-name">日本一簡単な株式投資</div><div class="nav-cpl">CPL ¥173</div></div>
-    <span class="nav-badge">230件</span>
+
+  <div class="sidebar-section open" onclick="toggleGroup(this)">LP一覧</div>
+  <div class="nav-group open">
+    <div class="nav-item" onclick="showPage('lp1',this)"><div><div class="nav-name">CV1_ノンタゲ7</div><div class="nav-cpl">CPL ¥587</div></div><span class="nav-badge">96件</span></div>
+    <div class="nav-item" onclick="showPage('lp2',this)"><div><div class="nav-name">CV1_ノンタゲ9</div><div class="nav-cpl">LINE 0件</div></div><span class="nav-badge">¥35,558</span></div>
+    <div class="nav-item" onclick="showPage('lp3',this)"><div><div class="nav-name">リード1_ノンタゲ2</div><div class="nav-cpl">CPL ¥478</div></div><span class="nav-badge">76件</span></div>
+    <div class="nav-item" onclick="showPage('lp4',this)"><div><div class="nav-name">リード1_ノンタゲ3</div><div class="nav-cpl">CPL ¥1,385</div></div><span class="nav-badge">24件</span></div>
   </div>
 </nav>
 
 <div class="main">
 
-<!-- ====== cr1: 50代でもスタートできる ====== -->
-<div id="cr1" class="page active">
-<div class="container">
+<!-- ==================== CREATIVE PAGES ==================== -->
+
+<!-- cr1: 50代でもスタートできる -->
+<div id="cr1" class="page active"><div class="container">
   <h1>「50代でもスタートできる」</h1>
-  <p class="subtitle">LINE登録期間：2025/11/30 〜 2026/03/28 ｜ 広告費期間：2026/03/18 〜 03/29</p>
-
-  <div class="note-box">
-    広告費データ（Meta）は 2026/03/18〜03/29 の12日間分のみ。週別CPLは広告費データがある週のみ算出。
-  </div>
-
-  <div class="cpl-hero">
-    <div class="value" id="cr1-cpl">¥143</div>
-    <div class="label-row">
-      <span class="label-text">1件あたりのLINE獲得単価（CPL）</span>
-      <select class="period-select" onchange="switchPeriod('cr1', this.value)">
-        <option value="all">全期間</option>
-        <option value="month">直近1ヶ月</option>
-        <option value="week">直近1週間</option>
-      </select>
-    </div>
-  </div>
-
+  <p class="subtitle">LINE登録：2025/11/30〜2026/03/28 ｜ 広告費：2026/03/18〜03/29</p>
+  <div class="note-box">広告費データ（Meta）は 2026/03/18〜03/29 の12日間分のみ。週別CPLは広告費データがある週のみ算出。</div>
+  <div class="cpl-hero"><div class="value" id="cr1-cpl">¥143</div><div class="label-row"><span class="label-text">LINE獲得単価（CPL）</span><select class="period-select" onchange="switchPeriod('cr1',this.value)"><option value="all">全期間</option><option value="month">直近1ヶ月</option><option value="week">直近1週間</option></select></div></div>
   <div class="kpi-grid">
-    <div class="kpi-card highlight">
-      <div class="kpi-label">広告費</div>
-      <div class="kpi-value" id="cr1-cost">¥26,073</div>
-      <div class="kpi-sub" id="cr1-cost-sub">全期間</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">LINE登録数</div>
-      <div class="kpi-value" id="cr1-line">182件</div>
-      <div class="kpi-sub" id="cr1-line-sub">全期間</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">クリック数</div>
-      <div class="kpi-value" id="cr1-clicks">170</div>
-      <div class="kpi-sub" id="cr1-ctr">CTR: 6.20%</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">インプレッション</div>
-      <div class="kpi-value" id="cr1-imp">2,741</div>
-      <div class="kpi-sub" id="cr1-cpc">CPC: ¥153</div>
-    </div>
+    <div class="kpi-card highlight"><div class="kpi-label">広告費</div><div class="kpi-value" id="cr1-cost">¥26,073</div><div class="kpi-sub" id="cr1-cost-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">LINE登録数</div><div class="kpi-value" id="cr1-line">182件</div><div class="kpi-sub" id="cr1-line-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">クリック数</div><div class="kpi-value" id="cr1-clicks">170</div><div class="kpi-sub" id="cr1-ctr">CTR: 6.20%</div></div>
+    <div class="kpi-card"><div class="kpi-label">インプレッション</div><div class="kpi-value" id="cr1-imp">2,741</div><div class="kpi-sub" id="cr1-cpc">CPC: ¥153</div></div>
   </div>
-
-  <div class="section">
-    <h2>週別 CPL</h2>
-    <table>
-      <thead><tr><th>週</th><th>期間</th><th class="num">LINE登録</th><th class="num">広告費</th><th class="num">CPL</th><th style="width:22%">登録数</th></tr></thead>
-      <tbody>
-        <tr><td>W48</td><td>11/24〜11/30</td><td class="num">1</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:5.6%"></div><div class="bar-label">1</div></div></td></tr>
-        <tr><td>W49</td><td>12/01〜12/07</td><td class="num">17</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:94.4%"></div><div class="bar-label">17</div></div></td></tr>
-        <tr><td>W50</td><td>12/08〜12/14</td><td class="num">18</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:100%"></div><div class="bar-label">18</div></div></td></tr>
-        <tr><td>W51</td><td>12/15〜12/21</td><td class="num">9</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:50%"></div><div class="bar-label">9</div></div></td></tr>
-        <tr><td>W52</td><td>12/22〜12/28</td><td class="num">8</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:44.4%"></div><div class="bar-label">8</div></div></td></tr>
-        <tr><td>W01</td><td>12/29〜01/04</td><td class="num">12</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:66.7%"></div><div class="bar-label">12</div></div></td></tr>
-        <tr><td>W02</td><td>01/05〜01/11</td><td class="num">12</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:66.7%"></div><div class="bar-label">12</div></div></td></tr>
-        <tr><td>W03</td><td>01/12〜01/18</td><td class="num">12</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:66.7%"></div><div class="bar-label">12</div></div></td></tr>
-        <tr><td>W04</td><td>01/19〜01/25</td><td class="num">15</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:83.3%"></div><div class="bar-label">15</div></div></td></tr>
-        <tr><td>W05</td><td>01/26〜02/01</td><td class="num">14</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:77.8%"></div><div class="bar-label">14</div></div></td></tr>
-        <tr><td>W06</td><td>02/02〜02/08</td><td class="num">8</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:44.4%"></div><div class="bar-label">8</div></div></td></tr>
-        <tr><td>W07</td><td>02/09〜02/15</td><td class="num">9</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:50%"></div><div class="bar-label">9</div></div></td></tr>
-        <tr><td>W08</td><td>02/16〜02/22</td><td class="num">7</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:38.9%"></div><div class="bar-label">7</div></div></td></tr>
-        <tr><td>W09</td><td>02/23〜03/01</td><td class="num">2</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:11.1%"></div><div class="bar-label">2</div></div></td></tr>
-        <tr><td>W10</td><td>03/02〜03/08</td><td class="num">2</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:11.1%"></div><div class="bar-label">2</div></div></td></tr>
-        <tr><td>W11</td><td>03/09〜03/15</td><td class="num">14</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:77.8%"></div><div class="bar-label">14</div></div></td></tr>
-        <tr class="has-ad"><td><strong>W12</strong></td><td>03/16〜03/22</td><td class="num">15</td><td class="num">¥6,489</td><td class="num cpl-cell">¥432</td><td><div class="bar-container"><div class="bar" style="width:83.3%"></div><div class="bar-label">15</div></div></td></tr>
-        <tr class="has-ad"><td><strong>W13</strong></td><td>03/23〜03/29</td><td class="num">7</td><td class="num">¥19,584</td><td class="num cpl-cell">¥2,797</td><td><div class="bar-container"><div class="bar" style="width:38.9%"></div><div class="bar-label">7</div></div></td></tr>
-        <tr style="font-weight:700; background:#f8f9fa;"><td colspan="2">合計</td><td class="num">182件</td><td class="num">¥26,073</td><td class="num" style="color:#764ba2">¥143</td><td></td></tr>
-      </tbody>
-    </table>
-    <p style="font-size:0.75rem; color:#999; margin-top:10px;">※ 紫背景 = 広告費データあり</p>
+  <div class="section"><h2>週別 CPL</h2>
+    <table><thead><tr><th>週</th><th>期間</th><th class="num">LINE</th><th class="num">広告費</th><th class="num">CPL</th><th style="width:20%">登録数</th></tr></thead><tbody>
+      <tr><td>W48</td><td>11/24〜11/30</td><td class="num">1</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:5.6%"></div><div class="bar-label">1</div></div></td></tr>
+      <tr><td>W49</td><td>12/01〜12/07</td><td class="num">17</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:94.4%"></div><div class="bar-label">17</div></div></td></tr>
+      <tr><td>W50</td><td>12/08〜12/14</td><td class="num">18</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:100%"></div><div class="bar-label">18</div></div></td></tr>
+      <tr><td>W51</td><td>12/15〜12/21</td><td class="num">9</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:50%"></div><div class="bar-label">9</div></div></td></tr>
+      <tr><td>W52</td><td>12/22〜12/28</td><td class="num">8</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:44.4%"></div><div class="bar-label">8</div></div></td></tr>
+      <tr><td>W01</td><td>12/29〜01/04</td><td class="num">12</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:66.7%"></div><div class="bar-label">12</div></div></td></tr>
+      <tr><td>W02</td><td>01/05〜01/11</td><td class="num">12</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:66.7%"></div><div class="bar-label">12</div></div></td></tr>
+      <tr><td>W03</td><td>01/12〜01/18</td><td class="num">12</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:66.7%"></div><div class="bar-label">12</div></div></td></tr>
+      <tr><td>W04</td><td>01/19〜01/25</td><td class="num">15</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:83.3%"></div><div class="bar-label">15</div></div></td></tr>
+      <tr><td>W05</td><td>01/26〜02/01</td><td class="num">14</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:77.8%"></div><div class="bar-label">14</div></div></td></tr>
+      <tr><td>W06</td><td>02/02〜02/08</td><td class="num">8</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:44.4%"></div><div class="bar-label">8</div></div></td></tr>
+      <tr><td>W07</td><td>02/09〜02/15</td><td class="num">9</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:50%"></div><div class="bar-label">9</div></div></td></tr>
+      <tr><td>W08</td><td>02/16〜02/22</td><td class="num">7</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:38.9%"></div><div class="bar-label">7</div></div></td></tr>
+      <tr><td>W09</td><td>02/23〜03/01</td><td class="num">2</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:11.1%"></div><div class="bar-label">2</div></div></td></tr>
+      <tr><td>W10</td><td>03/02〜03/08</td><td class="num">2</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:11.1%"></div><div class="bar-label">2</div></div></td></tr>
+      <tr><td>W11</td><td>03/09〜03/15</td><td class="num">14</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:77.8%"></div><div class="bar-label">14</div></div></td></tr>
+      <tr class="has-ad"><td><strong>W12</strong></td><td>03/16〜03/22</td><td class="num">15</td><td class="num">¥6,489</td><td class="num cpl-cell">¥432</td><td><div class="bar-container"><div class="bar" style="width:83.3%"></div><div class="bar-label">15</div></div></td></tr>
+      <tr class="has-ad"><td><strong>W13</strong></td><td>03/23〜03/29</td><td class="num">7</td><td class="num">¥19,584</td><td class="num cpl-cell">¥2,797</td><td><div class="bar-container"><div class="bar" style="width:38.9%"></div><div class="bar-label">7</div></div></td></tr>
+      <tr style="font-weight:700;background:#f8f9fa"><td colspan="2">合計</td><td class="num">182件</td><td class="num">¥26,073</td><td class="num" style="color:#764ba2">¥143</td><td></td></tr>
+    </tbody></table>
   </div>
-
   <div class="two-col">
-    <div class="section">
-      <h2>日別 広告費</h2>
-      <table>
-        <thead><tr><th>日付</th><th class="num">消化金額</th><th class="num">クリック</th><th class="num">IMP</th></tr></thead>
-        <tbody>
-          <tr><td>03/18</td><td class="num">¥3,210</td><td class="num">15</td><td class="num">314</td></tr>
-          <tr><td>03/19</td><td class="num">¥3,279</td><td class="num">19</td><td class="num">264</td></tr>
-          <tr><td>03/25</td><td class="num">¥5,107</td><td class="num">38</td><td class="num">462</td></tr>
-          <tr><td>03/26</td><td class="num">¥4,212</td><td class="num">23</td><td class="num">478</td></tr>
-          <tr><td>03/27</td><td class="num">¥4,944</td><td class="num">32</td><td class="num">503</td></tr>
-          <tr><td>03/28</td><td class="num">¥4,753</td><td class="num">37</td><td class="num">634</td></tr>
-          <tr><td>03/29</td><td class="num">¥568</td><td class="num">6</td><td class="num">86</td></tr>
-          <tr style="font-weight:700; background:#f8f9fa;"><td>合計</td><td class="num">¥26,073</td><td class="num">170</td><td class="num">2,741</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="section">
-      <h2>月別 LINE登録推移</h2>
-      <div class="monthly-chart">
-        <div class="month-bar-group"><div class="month-bar-value">1</div><div class="month-bar" style="height:1.8%"></div><div class="month-label">11月</div></div>
-        <div class="month-bar-group"><div class="month-bar-value">57</div><div class="month-bar" style="height:100%"></div><div class="month-label">12月</div></div>
-        <div class="month-bar-group"><div class="month-bar-value">55</div><div class="month-bar" style="height:96.5%"></div><div class="month-label">1月</div></div>
-        <div class="month-bar-group"><div class="month-bar-value">31</div><div class="month-bar" style="height:54.4%"></div><div class="month-label">2月</div></div>
-        <div class="month-bar-group"><div class="month-bar-value">38</div><div class="month-bar" style="height:66.7%"></div><div class="month-label">3月</div></div>
-      </div>
-    </div>
+    <div class="section"><h2>日別 広告費</h2><table><thead><tr><th>日付</th><th class="num">金額</th><th class="num">クリック</th><th class="num">IMP</th></tr></thead><tbody>
+      <tr><td>03/18</td><td class="num">¥3,210</td><td class="num">15</td><td class="num">314</td></tr><tr><td>03/19</td><td class="num">¥3,279</td><td class="num">19</td><td class="num">264</td></tr><tr><td>03/25</td><td class="num">¥5,107</td><td class="num">38</td><td class="num">462</td></tr><tr><td>03/26</td><td class="num">¥4,212</td><td class="num">23</td><td class="num">478</td></tr><tr><td>03/27</td><td class="num">¥4,944</td><td class="num">32</td><td class="num">503</td></tr><tr><td>03/28</td><td class="num">¥4,753</td><td class="num">37</td><td class="num">634</td></tr><tr><td>03/29</td><td class="num">¥568</td><td class="num">6</td><td class="num">86</td></tr>
+      <tr style="font-weight:700;background:#f8f9fa"><td>合計</td><td class="num">¥26,073</td><td class="num">170</td><td class="num">2,741</td></tr>
+    </tbody></table></div>
+    <div class="section"><h2>月別 LINE登録</h2><div class="monthly-chart">
+      <div class="month-bar-group"><div class="month-bar-value">1</div><div class="month-bar" style="height:1.8%"></div><div class="month-label">11月</div></div>
+      <div class="month-bar-group"><div class="month-bar-value">57</div><div class="month-bar" style="height:100%"></div><div class="month-label">12月</div></div>
+      <div class="month-bar-group"><div class="month-bar-value">55</div><div class="month-bar" style="height:96.5%"></div><div class="month-label">1月</div></div>
+      <div class="month-bar-group"><div class="month-bar-value">31</div><div class="month-bar" style="height:54.4%"></div><div class="month-label">2月</div></div>
+      <div class="month-bar-group"><div class="month-bar-value">38</div><div class="month-bar" style="height:66.7%"></div><div class="month-label">3月</div></div>
+    </div></div>
   </div>
-</div>
-</div>
+</div></div>
 
-<!-- ====== cr2: インタビューかずみさん ====== -->
-<div id="cr2" class="page">
-<div class="container">
+<!-- cr2: インタビューかずみさん -->
+<div id="cr2" class="page"><div class="container">
   <h1>「インタビューかずみさん」</h1>
-  <p class="subtitle">LINE登録期間：2026/01/13 〜 2026/03/20 ｜ 広告費期間：2026/03/18 〜 03/28</p>
-
-  <div class="note-box">
-    広告費データ（Meta）は 2026/03/18〜03/28 の期間のみ。LINE登録は全34件を集計。
-  </div>
-
-  <div class="cpl-hero">
-    <div class="value" id="cr2-cpl">¥84</div>
-    <div class="label-row">
-      <span class="label-text">1件あたりのLINE獲得単価（CPL）</span>
-      <select class="period-select" onchange="switchPeriod('cr2', this.value)">
-        <option value="all">全期間</option>
-        <option value="month">直近1ヶ月</option>
-        <option value="week">直近1週間</option>
-      </select>
-    </div>
-  </div>
-
+  <p class="subtitle">LINE登録：2026/01/13〜2026/03/20 ｜ 広告費：2026/03/18〜03/28</p>
+  <div class="note-box">広告費データ（Meta）は 2026/03/18〜03/28 の期間のみ。LINE登録は全34件を集計。</div>
+  <div class="cpl-hero"><div class="value" id="cr2-cpl">¥84</div><div class="label-row"><span class="label-text">LINE獲得単価（CPL）</span><select class="period-select" onchange="switchPeriod('cr2',this.value)"><option value="all">全期間</option><option value="month">直近1ヶ月</option><option value="week">直近1週間</option></select></div></div>
   <div class="kpi-grid">
-    <div class="kpi-card highlight">
-      <div class="kpi-label">広告費</div>
-      <div class="kpi-value" id="cr2-cost">¥2,849</div>
-      <div class="kpi-sub" id="cr2-cost-sub">全期間</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">LINE登録数</div>
-      <div class="kpi-value" id="cr2-line">34件</div>
-      <div class="kpi-sub" id="cr2-line-sub">全期間</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">クリック数</div>
-      <div class="kpi-value" id="cr2-clicks">7</div>
-      <div class="kpi-sub" id="cr2-ctr">CTR: 3.15%</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">インプレッション</div>
-      <div class="kpi-value" id="cr2-imp">222</div>
-      <div class="kpi-sub" id="cr2-cpc">CPC: ¥407</div>
-    </div>
+    <div class="kpi-card highlight"><div class="kpi-label">広告費</div><div class="kpi-value" id="cr2-cost">¥2,849</div><div class="kpi-sub" id="cr2-cost-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">LINE登録数</div><div class="kpi-value" id="cr2-line">34件</div><div class="kpi-sub" id="cr2-line-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">クリック数</div><div class="kpi-value" id="cr2-clicks">7</div><div class="kpi-sub" id="cr2-ctr">CTR: 3.15%</div></div>
+    <div class="kpi-card"><div class="kpi-label">インプレッション</div><div class="kpi-value" id="cr2-imp">222</div><div class="kpi-sub" id="cr2-cpc">CPC: ¥407</div></div>
   </div>
-
-  <div class="section">
-    <h2>週別 CPL</h2>
-    <table>
-      <thead><tr><th>週</th><th>期間</th><th class="num">LINE登録</th><th class="num">広告費</th><th class="num">CPL</th><th style="width:22%">登録数</th></tr></thead>
-      <tbody>
-        <tr><td>W03</td><td>01/12〜01/18</td><td class="num">5</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:50%"></div><div class="bar-label">5</div></div></td></tr>
-        <tr><td>W04</td><td>01/19〜01/25</td><td class="num">10</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:100%"></div><div class="bar-label">10</div></div></td></tr>
-        <tr><td>W05</td><td>01/26〜02/01</td><td class="num">6</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:60%"></div><div class="bar-label">6</div></div></td></tr>
-        <tr><td>W06</td><td>02/02〜02/08</td><td class="num">3</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:30%"></div><div class="bar-label">3</div></div></td></tr>
-        <tr><td>W09</td><td>02/23〜03/01</td><td class="num">4</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:40%"></div><div class="bar-label">4</div></div></td></tr>
-        <tr><td>W10</td><td>03/02〜03/08</td><td class="num">3</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:30%"></div><div class="bar-label">3</div></div></td></tr>
-        <tr><td>W11</td><td>03/09〜03/15</td><td class="num">1</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:10%"></div><div class="bar-label">1</div></div></td></tr>
-        <tr class="has-ad"><td><strong>W12</strong></td><td>03/16〜03/22</td><td class="num">2</td><td class="num">¥1,970</td><td class="num cpl-cell">¥985</td><td><div class="bar-container"><div class="bar" style="width:20%"></div><div class="bar-label">2</div></div></td></tr>
-        <tr class="has-ad"><td><strong>W13</strong></td><td>03/23〜03/29</td><td class="num">0</td><td class="num">¥879</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:0%"></div><div class="bar-label">0</div></div></td></tr>
-        <tr style="font-weight:700; background:#f8f9fa;"><td colspan="2">合計</td><td class="num">34件</td><td class="num">¥2,849</td><td class="num" style="color:#764ba2">¥84</td><td></td></tr>
-      </tbody>
-    </table>
-    <p style="font-size:0.75rem; color:#999; margin-top:10px;">※ 紫背景 = 広告費データあり</p>
-  </div>
-
+  <div class="section"><h2>週別 CPL</h2><table><thead><tr><th>週</th><th>期間</th><th class="num">LINE</th><th class="num">広告費</th><th class="num">CPL</th><th style="width:20%">登録数</th></tr></thead><tbody>
+    <tr><td>W03</td><td>01/12〜01/18</td><td class="num">5</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:50%"></div><div class="bar-label">5</div></div></td></tr>
+    <tr><td>W04</td><td>01/19〜01/25</td><td class="num">10</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:100%"></div><div class="bar-label">10</div></div></td></tr>
+    <tr><td>W05</td><td>01/26〜02/01</td><td class="num">6</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:60%"></div><div class="bar-label">6</div></div></td></tr>
+    <tr><td>W06</td><td>02/02〜02/08</td><td class="num">3</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:30%"></div><div class="bar-label">3</div></div></td></tr>
+    <tr><td>W09</td><td>02/23〜03/01</td><td class="num">4</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:40%"></div><div class="bar-label">4</div></div></td></tr>
+    <tr><td>W10</td><td>03/02〜03/08</td><td class="num">3</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:30%"></div><div class="bar-label">3</div></div></td></tr>
+    <tr><td>W11</td><td>03/09〜03/15</td><td class="num">1</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:10%"></div><div class="bar-label">1</div></div></td></tr>
+    <tr class="has-ad"><td><strong>W12</strong></td><td>03/16〜03/22</td><td class="num">2</td><td class="num">¥1,970</td><td class="num cpl-cell">¥985</td><td><div class="bar-container"><div class="bar" style="width:20%"></div><div class="bar-label">2</div></div></td></tr>
+    <tr class="has-ad"><td><strong>W13</strong></td><td>03/23〜03/29</td><td class="num">0</td><td class="num">¥879</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:0%"></div><div class="bar-label">0</div></div></td></tr>
+    <tr style="font-weight:700;background:#f8f9fa"><td colspan="2">合計</td><td class="num">34件</td><td class="num">¥2,849</td><td class="num" style="color:#764ba2">¥84</td><td></td></tr>
+  </tbody></table></div>
   <div class="two-col">
-    <div class="section">
-      <h2>日別 広告費</h2>
-      <table>
-        <thead><tr><th>日付</th><th class="num">消化金額</th><th class="num">クリック</th><th class="num">IMP</th></tr></thead>
-        <tbody>
-          <tr><td>03/18</td><td class="num">¥831</td><td class="num">4</td><td class="num">80</td></tr>
-          <tr><td>03/19</td><td class="num">¥1,139</td><td class="num">3</td><td class="num">82</td></tr>
-          <tr><td>03/25</td><td class="num">¥477</td><td class="num">0</td><td class="num">30</td></tr>
-          <tr><td>03/26</td><td class="num">¥223</td><td class="num">0</td><td class="num">18</td></tr>
-          <tr><td>03/27</td><td class="num">¥86</td><td class="num">0</td><td class="num">7</td></tr>
-          <tr><td>03/28</td><td class="num">¥93</td><td class="num">0</td><td class="num">5</td></tr>
-          <tr style="font-weight:700; background:#f8f9fa;"><td>合計</td><td class="num">¥2,849</td><td class="num">7</td><td class="num">222</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="section">
-      <h2>月別 LINE登録推移</h2>
-      <div class="monthly-chart">
-        <div class="month-bar-group"><div class="month-bar-value">20</div><div class="month-bar" style="height:100%"></div><div class="month-label">1月</div></div>
-        <div class="month-bar-group"><div class="month-bar-value">8</div><div class="month-bar" style="height:40%"></div><div class="month-label">2月</div></div>
-        <div class="month-bar-group"><div class="month-bar-value">6</div><div class="month-bar" style="height:30%"></div><div class="month-label">3月</div></div>
-      </div>
-    </div>
+    <div class="section"><h2>日別 広告費</h2><table><thead><tr><th>日付</th><th class="num">金額</th><th class="num">クリック</th><th class="num">IMP</th></tr></thead><tbody>
+      <tr><td>03/18</td><td class="num">¥831</td><td class="num">4</td><td class="num">80</td></tr><tr><td>03/19</td><td class="num">¥1,139</td><td class="num">3</td><td class="num">82</td></tr><tr><td>03/25</td><td class="num">¥477</td><td class="num">0</td><td class="num">30</td></tr><tr><td>03/26</td><td class="num">¥223</td><td class="num">0</td><td class="num">18</td></tr><tr><td>03/27</td><td class="num">¥86</td><td class="num">0</td><td class="num">7</td></tr><tr><td>03/28</td><td class="num">¥93</td><td class="num">0</td><td class="num">5</td></tr>
+      <tr style="font-weight:700;background:#f8f9fa"><td>合計</td><td class="num">¥2,849</td><td class="num">7</td><td class="num">222</td></tr>
+    </tbody></table></div>
+    <div class="section"><h2>月別 LINE登録</h2><div class="monthly-chart">
+      <div class="month-bar-group"><div class="month-bar-value">20</div><div class="month-bar" style="height:100%"></div><div class="month-label">1月</div></div>
+      <div class="month-bar-group"><div class="month-bar-value">8</div><div class="month-bar" style="height:40%"></div><div class="month-label">2月</div></div>
+      <div class="month-bar-group"><div class="month-bar-value">6</div><div class="month-bar" style="height:30%"></div><div class="month-label">3月</div></div>
+    </div></div>
   </div>
-</div>
-</div>
+</div></div>
 
-<!-- ====== cr3: 知識ゼロでも叶う ====== -->
-<div id="cr3" class="page">
-<div class="container">
+<!-- cr3: 知識ゼロでも叶う -->
+<div id="cr3" class="page"><div class="container">
   <h1>「知識ゼロでも叶う」</h1>
-  <p class="subtitle">LINE登録期間：2026/03/26 〜 2026/04/21 ｜ 広告費期間：2026/03/18 〜 03/28</p>
-
-  <div class="note-box">
-    広告費データ（Meta）は 2026/03/18〜03/28 の期間のみ。LINE登録は全4件。登録数が少ないためCPLは参考値。
-  </div>
-
-  <div class="cpl-hero">
-    <div class="value" id="cr3-cpl">¥64</div>
-    <div class="label-row">
-      <span class="label-text">1件あたりのLINE獲得単価（CPL）</span>
-      <select class="period-select" onchange="switchPeriod('cr3', this.value)">
-        <option value="all">全期間</option>
-        <option value="month">直近1ヶ月</option>
-        <option value="week">直近1週間</option>
-      </select>
-    </div>
-  </div>
-
+  <p class="subtitle">LINE登録：2026/03/26〜2026/04/21 ｜ 広告費：2026/03/18〜03/28</p>
+  <div class="note-box">広告費データ（Meta）は 2026/03/18〜03/28 の期間のみ。LINE登録は全4件。登録数が少ないためCPLは参考値。</div>
+  <div class="cpl-hero"><div class="value" id="cr3-cpl">¥64</div><div class="label-row"><span class="label-text">LINE獲得単価（CPL）</span><select class="period-select" onchange="switchPeriod('cr3',this.value)"><option value="all">全期間</option><option value="month">直近1ヶ月</option><option value="week">直近1週間</option></select></div></div>
   <div class="kpi-grid">
-    <div class="kpi-card highlight">
-      <div class="kpi-label">広告費</div>
-      <div class="kpi-value" id="cr3-cost">¥256</div>
-      <div class="kpi-sub" id="cr3-cost-sub">全期間</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">LINE登録数</div>
-      <div class="kpi-value" id="cr3-line">4件</div>
-      <div class="kpi-sub" id="cr3-line-sub">全期間</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">クリック数</div>
-      <div class="kpi-value" id="cr3-clicks">0</div>
-      <div class="kpi-sub" id="cr3-ctr">CTR: 0.00%</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">インプレッション</div>
-      <div class="kpi-value" id="cr3-imp">43</div>
-      <div class="kpi-sub" id="cr3-cpc">CPC: -</div>
-    </div>
+    <div class="kpi-card highlight"><div class="kpi-label">広告費</div><div class="kpi-value" id="cr3-cost">¥256</div><div class="kpi-sub" id="cr3-cost-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">LINE登録数</div><div class="kpi-value" id="cr3-line">4件</div><div class="kpi-sub" id="cr3-line-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">クリック数</div><div class="kpi-value" id="cr3-clicks">0</div><div class="kpi-sub" id="cr3-ctr">CTR: 0.00%</div></div>
+    <div class="kpi-card"><div class="kpi-label">インプレッション</div><div class="kpi-value" id="cr3-imp">43</div><div class="kpi-sub" id="cr3-cpc">CPC: -</div></div>
   </div>
-
-  <div class="section">
-    <h2>週別 CPL</h2>
-    <table>
-      <thead><tr><th>週</th><th>期間</th><th class="num">LINE登録</th><th class="num">広告費</th><th class="num">CPL</th><th style="width:22%">登録数</th></tr></thead>
-      <tbody>
-        <tr class="has-ad"><td><strong>W12</strong></td><td>03/16〜03/22</td><td class="num">0</td><td class="num">¥6</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:0%"></div><div class="bar-label">0</div></div></td></tr>
-        <tr class="has-ad"><td><strong>W13</strong></td><td>03/23〜03/29</td><td class="num">1</td><td class="num">¥250</td><td class="num cpl-cell">¥250</td><td><div class="bar-container"><div class="bar" style="width:50%"></div><div class="bar-label">1</div></div></td></tr>
-        <tr><td>W16</td><td>04/13〜04/19</td><td class="num">2</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:100%"></div><div class="bar-label">2</div></div></td></tr>
-        <tr><td>W17</td><td>04/20〜04/26</td><td class="num">1</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:50%"></div><div class="bar-label">1</div></div></td></tr>
-        <tr style="font-weight:700; background:#f8f9fa;"><td colspan="2">合計</td><td class="num">4件</td><td class="num">¥256</td><td class="num" style="color:#764ba2">¥64</td><td></td></tr>
-      </tbody>
-    </table>
-    <p style="font-size:0.75rem; color:#999; margin-top:10px;">※ 紫背景 = 広告費データあり</p>
-  </div>
-
+  <div class="section"><h2>週別 CPL</h2><table><thead><tr><th>週</th><th>期間</th><th class="num">LINE</th><th class="num">広告費</th><th class="num">CPL</th><th style="width:20%">登録数</th></tr></thead><tbody>
+    <tr class="has-ad"><td><strong>W12</strong></td><td>03/16〜03/22</td><td class="num">0</td><td class="num">¥6</td><td class="num no-data">-</td><td></td></tr>
+    <tr class="has-ad"><td><strong>W13</strong></td><td>03/23〜03/29</td><td class="num">1</td><td class="num">¥250</td><td class="num cpl-cell">¥250</td><td><div class="bar-container"><div class="bar" style="width:50%"></div><div class="bar-label">1</div></div></td></tr>
+    <tr><td>W16</td><td>04/13〜04/19</td><td class="num">2</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:100%"></div><div class="bar-label">2</div></div></td></tr>
+    <tr><td>W17</td><td>04/20〜04/26</td><td class="num">1</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:50%"></div><div class="bar-label">1</div></div></td></tr>
+    <tr style="font-weight:700;background:#f8f9fa"><td colspan="2">合計</td><td class="num">4件</td><td class="num">¥256</td><td class="num" style="color:#764ba2">¥64</td><td></td></tr>
+  </tbody></table></div>
   <div class="two-col">
-    <div class="section">
-      <h2>日別 広告費</h2>
-      <table>
-        <thead><tr><th>日付</th><th class="num">消化金額</th><th class="num">クリック</th><th class="num">IMP</th></tr></thead>
-        <tbody>
-          <tr><td>03/18</td><td class="num">¥6</td><td class="num">0</td><td class="num">2</td></tr>
-          <tr><td>03/25</td><td class="num">¥87</td><td class="num">0</td><td class="num">13</td></tr>
-          <tr><td>03/26</td><td class="num">¥122</td><td class="num">0</td><td class="num">16</td></tr>
-          <tr><td>03/27</td><td class="num">¥30</td><td class="num">0</td><td class="num">8</td></tr>
-          <tr><td>03/28</td><td class="num">¥11</td><td class="num">0</td><td class="num">4</td></tr>
-          <tr style="font-weight:700; background:#f8f9fa;"><td>合計</td><td class="num">¥256</td><td class="num">0</td><td class="num">43</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="section">
-      <h2>月別 LINE登録推移</h2>
-      <div class="monthly-chart">
-        <div class="month-bar-group"><div class="month-bar-value">1</div><div class="month-bar" style="height:33.3%"></div><div class="month-label">3月</div></div>
-        <div class="month-bar-group"><div class="month-bar-value">3</div><div class="month-bar" style="height:100%"></div><div class="month-label">4月</div></div>
-      </div>
-    </div>
+    <div class="section"><h2>日別 広告費</h2><table><thead><tr><th>日付</th><th class="num">金額</th><th class="num">クリック</th><th class="num">IMP</th></tr></thead><tbody>
+      <tr><td>03/18</td><td class="num">¥6</td><td class="num">0</td><td class="num">2</td></tr><tr><td>03/25</td><td class="num">¥87</td><td class="num">0</td><td class="num">13</td></tr><tr><td>03/26</td><td class="num">¥122</td><td class="num">0</td><td class="num">16</td></tr><tr><td>03/27</td><td class="num">¥30</td><td class="num">0</td><td class="num">8</td></tr><tr><td>03/28</td><td class="num">¥11</td><td class="num">0</td><td class="num">4</td></tr>
+      <tr style="font-weight:700;background:#f8f9fa"><td>合計</td><td class="num">¥256</td><td class="num">0</td><td class="num">43</td></tr>
+    </tbody></table></div>
+    <div class="section"><h2>月別 LINE登録</h2><div class="monthly-chart">
+      <div class="month-bar-group"><div class="month-bar-value">1</div><div class="month-bar" style="height:33%"></div><div class="month-label">3月</div></div>
+      <div class="month-bar-group"><div class="month-bar-value">3</div><div class="month-bar" style="height:100%"></div><div class="month-label">4月</div></div>
+    </div></div>
   </div>
-</div>
-</div>
+</div></div>
 
-<!-- ====== cr4: 日本一簡単な株式投資 ====== -->
-<div id="cr4" class="page">
-<div class="container">
+<!-- cr4: 日本一簡単な株式投資 -->
+<div id="cr4" class="page"><div class="container">
   <h1>「日本一簡単な株式投資」</h1>
-  <p class="subtitle">LINE登録期間：2026/02/27 〜 2026/05/22 ｜ 広告費期間：2026/03/18 〜 03/29</p>
-
-  <div class="note-box">
-    広告費データ（Meta）は 2026/03/18〜03/29 の期間のみ。LINE登録は全230件を集計。
-  </div>
-
-  <div class="cpl-hero">
-    <div class="value" id="cr4-cpl">¥173</div>
-    <div class="label-row">
-      <span class="label-text">1件あたりのLINE獲得単価（CPL）</span>
-      <select class="period-select" onchange="switchPeriod('cr4', this.value)">
-        <option value="all">全期間</option>
-        <option value="month">直近1ヶ月</option>
-        <option value="week">直近1週間</option>
-      </select>
-    </div>
-  </div>
-
+  <p class="subtitle">LINE登録：2026/02/27〜2026/05/22 ｜ 広告費：2026/03/18〜03/29</p>
+  <div class="note-box">広告費データ（Meta）は 2026/03/18〜03/29 の期間のみ。LINE登録は全230件を集計。</div>
+  <div class="cpl-hero"><div class="value" id="cr4-cpl">¥173</div><div class="label-row"><span class="label-text">LINE獲得単価（CPL）</span><select class="period-select" onchange="switchPeriod('cr4',this.value)"><option value="all">全期間</option><option value="month">直近1ヶ月</option><option value="week">直近1週間</option></select></div></div>
   <div class="kpi-grid">
-    <div class="kpi-card highlight">
-      <div class="kpi-label">広告費</div>
-      <div class="kpi-value" id="cr4-cost">¥39,691</div>
-      <div class="kpi-sub" id="cr4-cost-sub">全期間</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">LINE登録数</div>
-      <div class="kpi-value" id="cr4-line">230件</div>
-      <div class="kpi-sub" id="cr4-line-sub">全期間</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">クリック数</div>
-      <div class="kpi-value" id="cr4-clicks">183</div>
-      <div class="kpi-sub" id="cr4-ctr">CTR: 2.82%</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">インプレッション</div>
-      <div class="kpi-value" id="cr4-imp">6,500</div>
-      <div class="kpi-sub" id="cr4-cpc">CPC: ¥217</div>
-    </div>
+    <div class="kpi-card highlight"><div class="kpi-label">広告費</div><div class="kpi-value" id="cr4-cost">¥39,691</div><div class="kpi-sub" id="cr4-cost-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">LINE登録数</div><div class="kpi-value" id="cr4-line">230件</div><div class="kpi-sub" id="cr4-line-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">クリック数</div><div class="kpi-value" id="cr4-clicks">183</div><div class="kpi-sub" id="cr4-ctr">CTR: 2.82%</div></div>
+    <div class="kpi-card"><div class="kpi-label">インプレッション</div><div class="kpi-value" id="cr4-imp">6,500</div><div class="kpi-sub" id="cr4-cpc">CPC: ¥217</div></div>
   </div>
-
-  <div class="section">
-    <h2>週別 CPL</h2>
-    <table>
-      <thead><tr><th>週</th><th>期間</th><th class="num">LINE登録</th><th class="num">広告費</th><th class="num">CPL</th><th style="width:22%">登録数</th></tr></thead>
-      <tbody>
-        <tr><td>W09</td><td>02/23〜03/01</td><td class="num">13</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:44.8%"></div><div class="bar-label">13</div></div></td></tr>
-        <tr><td>W10</td><td>03/02〜03/08</td><td class="num">20</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:69%"></div><div class="bar-label">20</div></div></td></tr>
-        <tr><td>W11</td><td>03/09〜03/15</td><td class="num">28</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:96.6%"></div><div class="bar-label">28</div></div></td></tr>
-        <tr class="has-ad"><td><strong>W12</strong></td><td>03/16〜03/22</td><td class="num">29</td><td class="num">¥22,990</td><td class="num cpl-cell">¥793</td><td><div class="bar-container"><div class="bar" style="width:100%"></div><div class="bar-label">29</div></div></td></tr>
-        <tr class="has-ad"><td><strong>W13</strong></td><td>03/23〜03/29</td><td class="num">12</td><td class="num">¥16,701</td><td class="num cpl-cell">¥1,392</td><td><div class="bar-container"><div class="bar" style="width:41.4%"></div><div class="bar-label">12</div></div></td></tr>
-        <tr><td>W14</td><td>03/30〜04/05</td><td class="num">19</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:65.5%"></div><div class="bar-label">19</div></div></td></tr>
-        <tr><td>W15</td><td>04/06〜04/12</td><td class="num">19</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:65.5%"></div><div class="bar-label">19</div></div></td></tr>
-        <tr><td>W16</td><td>04/13〜04/19</td><td class="num">16</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:55.2%"></div><div class="bar-label">16</div></div></td></tr>
-        <tr><td>W17</td><td>04/20〜04/26</td><td class="num">14</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:48.3%"></div><div class="bar-label">14</div></div></td></tr>
-        <tr><td>W18</td><td>04/27〜05/03</td><td class="num">8</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:27.6%"></div><div class="bar-label">8</div></div></td></tr>
-        <tr><td>W19</td><td>05/04〜05/10</td><td class="num">16</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:55.2%"></div><div class="bar-label">16</div></div></td></tr>
-        <tr><td>W20</td><td>05/11〜05/17</td><td class="num">19</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:65.5%"></div><div class="bar-label">19</div></div></td></tr>
-        <tr><td>W21</td><td>05/18〜05/24</td><td class="num">17</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:58.6%"></div><div class="bar-label">17</div></div></td></tr>
-        <tr style="font-weight:700; background:#f8f9fa;"><td colspan="2">合計</td><td class="num">230件</td><td class="num">¥39,691</td><td class="num" style="color:#764ba2">¥173</td><td></td></tr>
-      </tbody>
-    </table>
-    <p style="font-size:0.75rem; color:#999; margin-top:10px;">※ 紫背景 = 広告費データあり</p>
-  </div>
-
+  <div class="section"><h2>週別 CPL</h2><table><thead><tr><th>週</th><th>期間</th><th class="num">LINE</th><th class="num">広告費</th><th class="num">CPL</th><th style="width:20%">登録数</th></tr></thead><tbody>
+    <tr><td>W09</td><td>02/23〜03/01</td><td class="num">13</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:44.8%"></div><div class="bar-label">13</div></div></td></tr>
+    <tr><td>W10</td><td>03/02〜03/08</td><td class="num">20</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:69%"></div><div class="bar-label">20</div></div></td></tr>
+    <tr><td>W11</td><td>03/09〜03/15</td><td class="num">28</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:96.6%"></div><div class="bar-label">28</div></div></td></tr>
+    <tr class="has-ad"><td><strong>W12</strong></td><td>03/16〜03/22</td><td class="num">29</td><td class="num">¥22,990</td><td class="num cpl-cell">¥793</td><td><div class="bar-container"><div class="bar" style="width:100%"></div><div class="bar-label">29</div></div></td></tr>
+    <tr class="has-ad"><td><strong>W13</strong></td><td>03/23〜03/29</td><td class="num">12</td><td class="num">¥16,701</td><td class="num cpl-cell">¥1,392</td><td><div class="bar-container"><div class="bar" style="width:41.4%"></div><div class="bar-label">12</div></div></td></tr>
+    <tr><td>W14</td><td>03/30〜04/05</td><td class="num">19</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:65.5%"></div><div class="bar-label">19</div></div></td></tr>
+    <tr><td>W15</td><td>04/06〜04/12</td><td class="num">19</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:65.5%"></div><div class="bar-label">19</div></div></td></tr>
+    <tr><td>W16</td><td>04/13〜04/19</td><td class="num">16</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:55.2%"></div><div class="bar-label">16</div></div></td></tr>
+    <tr><td>W17</td><td>04/20〜04/26</td><td class="num">14</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:48.3%"></div><div class="bar-label">14</div></div></td></tr>
+    <tr><td>W18</td><td>04/27〜05/03</td><td class="num">8</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:27.6%"></div><div class="bar-label">8</div></div></td></tr>
+    <tr><td>W19</td><td>05/04〜05/10</td><td class="num">16</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:55.2%"></div><div class="bar-label">16</div></div></td></tr>
+    <tr><td>W20</td><td>05/11〜05/17</td><td class="num">19</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:65.5%"></div><div class="bar-label">19</div></div></td></tr>
+    <tr><td>W21</td><td>05/18〜05/24</td><td class="num">17</td><td class="num no-data">-</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar light" style="width:58.6%"></div><div class="bar-label">17</div></div></td></tr>
+    <tr style="font-weight:700;background:#f8f9fa"><td colspan="2">合計</td><td class="num">230件</td><td class="num">¥39,691</td><td class="num" style="color:#764ba2">¥173</td><td></td></tr>
+  </tbody></table></div>
   <div class="two-col">
-    <div class="section">
-      <h2>日別 広告費</h2>
-      <table>
-        <thead><tr><th>日付</th><th class="num">消化金額</th><th class="num">クリック</th><th class="num">IMP</th></tr></thead>
-        <tbody>
-          <tr><td>03/18</td><td class="num">¥11,837</td><td class="num">50</td><td class="num">1,784</td></tr>
-          <tr><td>03/19</td><td class="num">¥11,153</td><td class="num">47</td><td class="num">1,529</td></tr>
-          <tr><td>03/25</td><td class="num">¥4,438</td><td class="num">32</td><td class="num">993</td></tr>
-          <tr><td>03/26</td><td class="num">¥4,465</td><td class="num">20</td><td class="num">847</td></tr>
-          <tr><td>03/27</td><td class="num">¥3,597</td><td class="num">18</td><td class="num">644</td></tr>
-          <tr><td>03/28</td><td class="num">¥3,893</td><td class="num">16</td><td class="num">647</td></tr>
-          <tr><td>03/29</td><td class="num">¥308</td><td class="num">0</td><td class="num">56</td></tr>
-          <tr style="font-weight:700; background:#f8f9fa;"><td>合計</td><td class="num">¥39,691</td><td class="num">183</td><td class="num">6,500</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="section">
-      <h2>月別 LINE登録推移</h2>
-      <div class="monthly-chart">
-        <div class="month-bar-group"><div class="month-bar-value">8</div><div class="month-bar" style="height:8.5%"></div><div class="month-label">2月</div></div>
-        <div class="month-bar-group"><div class="month-bar-value">94</div><div class="month-bar" style="height:100%"></div><div class="month-label">3月</div></div>
-        <div class="month-bar-group"><div class="month-bar-value">74</div><div class="month-bar" style="height:78.7%"></div><div class="month-label">4月</div></div>
-        <div class="month-bar-group"><div class="month-bar-value">54</div><div class="month-bar" style="height:57.4%"></div><div class="month-label">5月</div></div>
-      </div>
-    </div>
+    <div class="section"><h2>日別 広告費</h2><table><thead><tr><th>日付</th><th class="num">金額</th><th class="num">クリック</th><th class="num">IMP</th></tr></thead><tbody>
+      <tr><td>03/18</td><td class="num">¥11,837</td><td class="num">50</td><td class="num">1,784</td></tr><tr><td>03/19</td><td class="num">¥11,153</td><td class="num">47</td><td class="num">1,529</td></tr><tr><td>03/25</td><td class="num">¥4,438</td><td class="num">32</td><td class="num">993</td></tr><tr><td>03/26</td><td class="num">¥4,465</td><td class="num">20</td><td class="num">847</td></tr><tr><td>03/27</td><td class="num">¥3,597</td><td class="num">18</td><td class="num">644</td></tr><tr><td>03/28</td><td class="num">¥3,893</td><td class="num">16</td><td class="num">647</td></tr><tr><td>03/29</td><td class="num">¥308</td><td class="num">0</td><td class="num">56</td></tr>
+      <tr style="font-weight:700;background:#f8f9fa"><td>合計</td><td class="num">¥39,691</td><td class="num">183</td><td class="num">6,500</td></tr>
+    </tbody></table></div>
+    <div class="section"><h2>月別 LINE登録</h2><div class="monthly-chart">
+      <div class="month-bar-group"><div class="month-bar-value">8</div><div class="month-bar" style="height:8.5%"></div><div class="month-label">2月</div></div>
+      <div class="month-bar-group"><div class="month-bar-value">94</div><div class="month-bar" style="height:100%"></div><div class="month-label">3月</div></div>
+      <div class="month-bar-group"><div class="month-bar-value">74</div><div class="month-bar" style="height:78.7%"></div><div class="month-label">4月</div></div>
+      <div class="month-bar-group"><div class="month-bar-value">54</div><div class="month-bar" style="height:57.4%"></div><div class="month-label">5月</div></div>
+    </div></div>
   </div>
-</div>
-</div>
+</div></div>
+
+<!-- ==================== LP PAGES ==================== -->
+
+<!-- lp1: CV1_ノンタゲ7 -->
+<div id="lp1" class="page"><div class="container">
+  <h1>LP「CV1_ノンタゲ7」</h1>
+  <p class="subtitle">広告費：2026/03/18〜03/29 ｜ LINE登録 96件</p>
+  <div class="cpl-hero"><div class="value" id="lp1-cpl">¥587</div><div class="label-row"><span class="label-text">LINE獲得単価（CPL）</span><select class="period-select" onchange="switchPeriod('lp1',this.value)"><option value="all">全期間</option><option value="month">直近1ヶ月</option><option value="week">直近1週間</option></select></div></div>
+  <div class="kpi-grid">
+    <div class="kpi-card highlight"><div class="kpi-label">広告費</div><div class="kpi-value" id="lp1-cost">¥56,440</div><div class="kpi-sub" id="lp1-cost-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">LINE登録数</div><div class="kpi-value" id="lp1-line">96件</div><div class="kpi-sub" id="lp1-line-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">クリック数</div><div class="kpi-value" id="lp1-clicks">318</div><div class="kpi-sub" id="lp1-ctr">CTR: 4.12%</div></div>
+    <div class="kpi-card"><div class="kpi-label">インプレッション</div><div class="kpi-value" id="lp1-imp">7,718</div><div class="kpi-sub" id="lp1-cpc">CPC: ¥177</div></div>
+  </div>
+  <div class="section"><h2>クリエイティブ別 CPL</h2>
+    <table class="cr-table"><thead><tr><th>クリエイティブ</th><th class="num">広告費</th><th class="num">クリック</th><th class="num">LINE</th><th class="num">CPL</th><th style="width:18%">コスト比率</th></tr></thead><tbody>
+      <tr><td>日本一簡単な株式投資</td><td class="num">¥29,289</td><td class="num">145</td><td class="num">55</td><td class="num cpl-cell">¥532</td><td><div class="bar-container"><div class="bar" style="width:51.9%"></div><div class="bar-label">51.9%</div></div></td></tr>
+      <tr><td>50代でもスタートできる</td><td class="num">¥26,073</td><td class="num">170</td><td class="num">36</td><td class="num cpl-cell">¥724</td><td><div class="bar-container"><div class="bar" style="width:46.2%"></div><div class="bar-label">46.2%</div></div></td></tr>
+      <tr><td>インタビューかずみさん</td><td class="num">¥895</td><td class="num">1</td><td class="num">1</td><td class="num cpl-cell">¥895</td><td><div class="bar-container"><div class="bar" style="width:1.6%"></div><div class="bar-label">1.6%</div></div></td></tr>
+      <tr><td>FV訴求</td><td class="num">¥164</td><td class="num">1</td><td class="num">1</td><td class="num cpl-cell">¥164</td><td><div class="bar-container"><div class="bar" style="width:0.3%"></div><div class="bar-label">0.3%</div></div></td></tr>
+      <tr><td>仲間とやるから続けられる</td><td class="num">¥19</td><td class="num">1</td><td class="num">3</td><td class="num cpl-cell">¥6</td><td><div class="bar-container"><div class="bar" style="width:0%"></div><div class="bar-label">0.0%</div></div></td></tr>
+      <tr class="total-row"><td>合計</td><td class="num">¥56,440</td><td class="num">318</td><td class="num">96</td><td class="num" style="color:#764ba2">¥587</td><td></td></tr>
+    </tbody></table>
+  </div>
+</div></div>
+
+<!-- lp2: CV1_ノンタゲ9 -->
+<div id="lp2" class="page"><div class="container">
+  <h1>LP「CV1_ノンタゲ9」</h1>
+  <p class="subtitle">広告費：2026/03/18〜03/29 ｜ LINE登録 0件</p>
+  <div class="note-box">このLPは広告費 ¥35,558 を消化していますが、対応するLINE登録が0件です。UTageの登録経路に「CV1_ノンタゲ9」が存在しないか、別のLP名で記録されている可能性があります。</div>
+  <div class="cpl-hero"><div class="value" id="lp2-cpl">-</div><div class="label-row"><span class="label-text">LINE獲得単価（CPL）</span><select class="period-select" onchange="switchPeriod('lp2',this.value)"><option value="all">全期間</option><option value="month">直近1ヶ月</option><option value="week">直近1週間</option></select></div></div>
+  <div class="kpi-grid">
+    <div class="kpi-card highlight"><div class="kpi-label">広告費</div><div class="kpi-value" id="lp2-cost">¥35,558</div><div class="kpi-sub" id="lp2-cost-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">LINE登録数</div><div class="kpi-value" id="lp2-line">0件</div><div class="kpi-sub" id="lp2-line-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">クリック数</div><div class="kpi-value" id="lp2-clicks">106</div><div class="kpi-sub" id="lp2-ctr">CTR: 2.12%</div></div>
+    <div class="kpi-card"><div class="kpi-label">インプレッション</div><div class="kpi-value" id="lp2-imp">4,996</div><div class="kpi-sub" id="lp2-cpc">CPC: ¥335</div></div>
+  </div>
+  <div class="section"><h2>クリエイティブ別 消化金額</h2>
+    <table class="cr-table"><thead><tr><th>クリエイティブ</th><th class="num">広告費</th><th class="num">クリック</th><th class="num">LINE</th><th class="num">CPL</th><th style="width:18%">コスト比率</th></tr></thead><tbody>
+      <tr><td>仲間とやるから続けられる</td><td class="num">¥24,167</td><td class="num">74</td><td class="num">0</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:68%"></div><div class="bar-label">68.0%</div></div></td></tr>
+      <tr><td>かずみさんショート【きっかけ】</td><td class="num">¥7,156</td><td class="num">19</td><td class="num">0</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:20.1%"></div><div class="bar-label">20.1%</div></div></td></tr>
+      <tr><td>FV訴求</td><td class="num">¥2,172</td><td class="num">6</td><td class="num">0</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:6.1%"></div><div class="bar-label">6.1%</div></div></td></tr>
+      <tr><td>インタビューかずみさん</td><td class="num">¥1,954</td><td class="num">6</td><td class="num">0</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:5.5%"></div><div class="bar-label">5.5%</div></div></td></tr>
+      <tr><td>かずみさんショート【成果】</td><td class="num">¥109</td><td class="num">1</td><td class="num">0</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:0.3%"></div><div class="bar-label">0.3%</div></div></td></tr>
+      <tr class="total-row"><td>合計</td><td class="num">¥35,558</td><td class="num">106</td><td class="num">0</td><td class="num no-data">-</td><td></td></tr>
+    </tbody></table>
+  </div>
+</div></div>
+
+<!-- lp3: リード1_ノンタゲ2 -->
+<div id="lp3" class="page"><div class="container">
+  <h1>LP「リード1_ノンタゲ2」</h1>
+  <p class="subtitle">広告費：2026/03/18〜03/29 ｜ LINE登録 76件</p>
+  <div class="cpl-hero"><div class="value" id="lp3-cpl">¥478</div><div class="label-row"><span class="label-text">LINE獲得単価（CPL）</span><select class="period-select" onchange="switchPeriod('lp3',this.value)"><option value="all">全期間</option><option value="month">直近1ヶ月</option><option value="week">直近1週間</option></select></div></div>
+  <div class="kpi-grid">
+    <div class="kpi-card highlight"><div class="kpi-label">広告費</div><div class="kpi-value" id="lp3-cost">¥36,360</div><div class="kpi-sub" id="lp3-cost-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">LINE登録数</div><div class="kpi-value" id="lp3-line">76件</div><div class="kpi-sub" id="lp3-line-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">クリック数</div><div class="kpi-value" id="lp3-clicks">120</div><div class="kpi-sub" id="lp3-ctr">CTR: 2.52%</div></div>
+    <div class="kpi-card"><div class="kpi-label">インプレッション</div><div class="kpi-value" id="lp3-imp">4,767</div><div class="kpi-sub" id="lp3-cpc">CPC: ¥303</div></div>
+  </div>
+  <div class="section"><h2>クリエイティブ別 CPL</h2>
+    <table class="cr-table"><thead><tr><th>クリエイティブ</th><th class="num">広告費</th><th class="num">クリック</th><th class="num">LINE</th><th class="num">CPL</th><th style="width:18%">コスト比率</th></tr></thead><tbody>
+      <tr><td>円安だけど気にしない</td><td class="num">¥15,555</td><td class="num">55</td><td class="num">7</td><td class="num cpl-cell">¥2,222</td><td><div class="bar-container"><div class="bar" style="width:42.8%"></div><div class="bar-label">42.8%</div></div></td></tr>
+      <tr><td>かずみさんショート【きっかけ】</td><td class="num">¥9,552</td><td class="num">30</td><td class="num">4</td><td class="num cpl-cell">¥2,388</td><td><div class="bar-container"><div class="bar" style="width:26.3%"></div><div class="bar-label">26.3%</div></div></td></tr>
+      <tr><td>日本一簡単な株式投資</td><td class="num">¥8,523</td><td class="num">32</td><td class="num">45</td><td class="num cpl-cell">¥189</td><td><div class="bar-container"><div class="bar" style="width:23.4%"></div><div class="bar-label">23.4%</div></div></td></tr>
+      <tr><td>インタビューまりこさん</td><td class="num">¥992</td><td class="num">2</td><td class="num">1</td><td class="num cpl-cell">¥992</td><td><div class="bar-container"><div class="bar" style="width:2.7%"></div><div class="bar-label">2.7%</div></div></td></tr>
+      <tr><td>子供の選択肢を増やす</td><td class="num">¥665</td><td class="num">1</td><td class="num">0</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:1.8%"></div><div class="bar-label">1.8%</div></div></td></tr>
+      <tr><td>いつか投資を始めたいver2</td><td class="num">¥600</td><td class="num">0</td><td class="num">0</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:1.7%"></div><div class="bar-label">1.7%</div></div></td></tr>
+      <tr><td>知識ゼロでも叶う</td><td class="num">¥256</td><td class="num">0</td><td class="num">1</td><td class="num cpl-cell">¥256</td><td><div class="bar-container"><div class="bar" style="width:0.7%"></div><div class="bar-label">0.7%</div></div></td></tr>
+      <tr><td>かずみさんショート【成果】</td><td class="num">¥216</td><td class="num">0</td><td class="num">0</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:0.6%"></div><div class="bar-label">0.6%</div></div></td></tr>
+      <tr><td>投資という人生の味方</td><td class="num">¥1</td><td class="num">0</td><td class="num">1</td><td class="num cpl-cell">¥1</td><td><div class="bar-container"><div class="bar" style="width:0%"></div><div class="bar-label">0.0%</div></div></td></tr>
+      <tr style="color:#888"><td>NISAの次の一歩 *</td><td class="num">-</td><td class="num">-</td><td class="num">6</td><td class="num no-data">-</td><td></td></tr>
+      <tr style="color:#888"><td>一歩進んだ資産づくり *</td><td class="num">-</td><td class="num">-</td><td class="num">8</td><td class="num no-data">-</td><td></td></tr>
+      <tr style="color:#888"><td>NISA放置卒業 *</td><td class="num">-</td><td class="num">-</td><td class="num">2</td><td class="num no-data">-</td><td></td></tr>
+      <tr class="total-row"><td>合計</td><td class="num">¥36,360</td><td class="num">120</td><td class="num">76</td><td class="num" style="color:#764ba2">¥478</td><td></td></tr>
+    </tbody></table>
+    <p style="font-size:.72rem;color:#999;margin-top:8px">* 広告費データなし（LINE登録のみ）</p>
+  </div>
+</div></div>
+
+<!-- lp4: リード1_ノンタゲ3 -->
+<div id="lp4" class="page"><div class="container">
+  <h1>LP「リード1_ノンタゲ3」</h1>
+  <p class="subtitle">広告費：2026/03/18〜03/29 ｜ LINE登録 24件</p>
+  <div class="cpl-hero"><div class="value" id="lp4-cpl">¥1,385</div><div class="label-row"><span class="label-text">LINE獲得単価（CPL）</span><select class="period-select" onchange="switchPeriod('lp4',this.value)"><option value="all">全期間</option><option value="month">直近1ヶ月</option><option value="week">直近1週間</option></select></div></div>
+  <div class="kpi-grid">
+    <div class="kpi-card highlight"><div class="kpi-label">広告費</div><div class="kpi-value" id="lp4-cost">¥33,243</div><div class="kpi-sub" id="lp4-cost-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">LINE登録数</div><div class="kpi-value" id="lp4-line">24件</div><div class="kpi-sub" id="lp4-line-sub">全期間</div></div>
+    <div class="kpi-card"><div class="kpi-label">クリック数</div><div class="kpi-value" id="lp4-clicks">109</div><div class="kpi-sub" id="lp4-ctr">CTR: 2.73%</div></div>
+    <div class="kpi-card"><div class="kpi-label">インプレッション</div><div class="kpi-value" id="lp4-imp">3,998</div><div class="kpi-sub" id="lp4-cpc">CPC: ¥304</div></div>
+  </div>
+  <div class="section"><h2>クリエイティブ別 CPL</h2>
+    <table class="cr-table"><thead><tr><th>クリエイティブ</th><th class="num">広告費</th><th class="num">クリック</th><th class="num">LINE</th><th class="num">CPL</th><th style="width:18%">コスト比率</th></tr></thead><tbody>
+      <tr><td>NISAの次の一歩</td><td class="num">¥29,687</td><td class="num">102</td><td class="num">23</td><td class="num cpl-cell">¥1,290</td><td><div class="bar-container"><div class="bar" style="width:89.3%"></div><div class="bar-label">89.3%</div></div></td></tr>
+      <tr><td>日本一簡単な株式投資</td><td class="num">¥1,879</td><td class="num">6</td><td class="num">1</td><td class="num cpl-cell">¥1,879</td><td><div class="bar-container"><div class="bar" style="width:5.7%"></div><div class="bar-label">5.7%</div></div></td></tr>
+      <tr><td>インタビューかずよさん</td><td class="num">¥867</td><td class="num">0</td><td class="num">0</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:2.6%"></div><div class="bar-label">2.6%</div></div></td></tr>
+      <tr><td>一歩進んだ資産づくり</td><td class="num">¥731</td><td class="num">1</td><td class="num">0</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:2.2%"></div><div class="bar-label">2.2%</div></div></td></tr>
+      <tr><td>いつか投資を始めたい</td><td class="num">¥53</td><td class="num">0</td><td class="num">0</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:0.2%"></div><div class="bar-label">0.2%</div></div></td></tr>
+      <tr><td>自分で選べる投資</td><td class="num">¥26</td><td class="num">0</td><td class="num">0</td><td class="num no-data">-</td><td><div class="bar-container"><div class="bar" style="width:0.1%"></div><div class="bar-label">0.1%</div></div></td></tr>
+      <tr class="total-row"><td>合計</td><td class="num">¥33,243</td><td class="num">109</td><td class="num">24</td><td class="num" style="color:#764ba2">¥1,385</td><td></td></tr>
+    </tbody></table>
+  </div>
+</div></div>
 
 </div><!-- /main -->
 
 <script>
 const DATA = {
   cr1: {
-    all:   { cost: 26073, line: 182, clicks: 170, imp: 2741, cpl: "¥143",   costFmt: "¥26,073", lineFmt: "182件", clicksFmt: "170",   impFmt: "2,741", ctr: "CTR: 6.20%", cpc: "CPC: ¥153",  period: "全期間" },
-    month: { cost: 26073, line: 38,  clicks: 170, imp: 2741, cpl: "¥686",   costFmt: "¥26,073", lineFmt: "38件",  clicksFmt: "170",   impFmt: "2,741", ctr: "CTR: 6.20%", cpc: "CPC: ¥153",  period: "03/01〜03/29" },
-    week:  { cost: 19584, line: 7,   clicks: 136, imp: 2163, cpl: "¥2,798", costFmt: "¥19,584", lineFmt: "7件",   clicksFmt: "136",   impFmt: "2,163", ctr: "CTR: 6.29%", cpc: "CPC: ¥144",  period: "03/23〜03/29" }
+    all:   {cpl:"¥143",costFmt:"¥26,073",lineFmt:"182件",clicksFmt:"170",impFmt:"2,741",ctr:"CTR: 6.20%",cpc:"CPC: ¥153",period:"全期間"},
+    month: {cpl:"¥686",costFmt:"¥26,073",lineFmt:"38件",clicksFmt:"170",impFmt:"2,741",ctr:"CTR: 6.20%",cpc:"CPC: ¥153",period:"03/01〜03/29"},
+    week:  {cpl:"¥2,798",costFmt:"¥19,584",lineFmt:"7件",clicksFmt:"136",impFmt:"2,163",ctr:"CTR: 6.29%",cpc:"CPC: ¥144",period:"03/23〜03/29"}
   },
   cr2: {
-    all:   { cost: 2849, line: 34, clicks: 7, imp: 222, cpl: "¥84",    costFmt: "¥2,849", lineFmt: "34件", clicksFmt: "7", impFmt: "222", ctr: "CTR: 3.15%", cpc: "CPC: ¥407", period: "全期間" },
-    month: { cost: 2849, line: 8,  clicks: 7, imp: 222, cpl: "¥356",   costFmt: "¥2,849", lineFmt: "8件",  clicksFmt: "7", impFmt: "222", ctr: "CTR: 3.15%", cpc: "CPC: ¥407", period: "03/01〜03/29" },
-    week:  { cost: 879,  line: 0,  clicks: 0, imp: 60,  cpl: "-",      costFmt: "¥879",   lineFmt: "0件",  clicksFmt: "0", impFmt: "60",  ctr: "CTR: 0.00%", cpc: "CPC: -",    period: "03/23〜03/29" }
+    all:   {cpl:"¥84",costFmt:"¥2,849",lineFmt:"34件",clicksFmt:"7",impFmt:"222",ctr:"CTR: 3.15%",cpc:"CPC: ¥407",period:"全期間"},
+    month: {cpl:"¥356",costFmt:"¥2,849",lineFmt:"8件",clicksFmt:"7",impFmt:"222",ctr:"CTR: 3.15%",cpc:"CPC: ¥407",period:"03/01〜03/29"},
+    week:  {cpl:"-",costFmt:"¥879",lineFmt:"0件",clicksFmt:"0",impFmt:"60",ctr:"CTR: 0.00%",cpc:"CPC: -",period:"03/23〜03/29"}
   },
   cr3: {
-    all:   { cost: 256, line: 4, clicks: 0, imp: 43, cpl: "¥64",  costFmt: "¥256", lineFmt: "4件", clicksFmt: "0", impFmt: "43", ctr: "CTR: 0.00%", cpc: "CPC: -", period: "全期間" },
-    month: { cost: 256, line: 1, clicks: 0, imp: 43, cpl: "¥256", costFmt: "¥256", lineFmt: "1件", clicksFmt: "0", impFmt: "43", ctr: "CTR: 0.00%", cpc: "CPC: -", period: "03/01〜03/29" },
-    week:  { cost: 250, line: 1, clicks: 0, imp: 41, cpl: "¥250", costFmt: "¥250", lineFmt: "1件", clicksFmt: "0", impFmt: "41", ctr: "CTR: 0.00%", cpc: "CPC: -", period: "03/23〜03/29" }
+    all:   {cpl:"¥64",costFmt:"¥256",lineFmt:"4件",clicksFmt:"0",impFmt:"43",ctr:"CTR: 0.00%",cpc:"CPC: -",period:"全期間"},
+    month: {cpl:"¥256",costFmt:"¥256",lineFmt:"1件",clicksFmt:"0",impFmt:"43",ctr:"CTR: 0.00%",cpc:"CPC: -",period:"03/01〜03/29"},
+    week:  {cpl:"¥250",costFmt:"¥250",lineFmt:"1件",clicksFmt:"0",impFmt:"41",ctr:"CTR: 0.00%",cpc:"CPC: -",period:"03/23〜03/29"}
   },
   cr4: {
-    all:   { cost: 39691, line: 230, clicks: 183, imp: 6500, cpl: "¥173",   costFmt: "¥39,691", lineFmt: "230件", clicksFmt: "183", impFmt: "6,500", ctr: "CTR: 2.82%", cpc: "CPC: ¥217", period: "全期間" },
-    month: { cost: 39691, line: 97,  clicks: 183, imp: 6500, cpl: "¥409",   costFmt: "¥39,691", lineFmt: "97件",  clicksFmt: "183", impFmt: "6,500", ctr: "CTR: 2.82%", cpc: "CPC: ¥217", period: "03/01〜03/29" },
-    week:  { cost: 16701, line: 12,  clicks: 86,  imp: 3187, cpl: "¥1,392", costFmt: "¥16,701", lineFmt: "12件",  clicksFmt: "86",  impFmt: "3,187", ctr: "CTR: 2.70%", cpc: "CPC: ¥194", period: "03/23〜03/29" }
+    all:   {cpl:"¥173",costFmt:"¥39,691",lineFmt:"230件",clicksFmt:"183",impFmt:"6,500",ctr:"CTR: 2.82%",cpc:"CPC: ¥217",period:"全期間"},
+    month: {cpl:"¥409",costFmt:"¥39,691",lineFmt:"97件",clicksFmt:"183",impFmt:"6,500",ctr:"CTR: 2.82%",cpc:"CPC: ¥217",period:"03/01〜03/29"},
+    week:  {cpl:"¥1,392",costFmt:"¥16,701",lineFmt:"12件",clicksFmt:"86",impFmt:"3,187",ctr:"CTR: 2.70%",cpc:"CPC: ¥194",period:"03/23〜03/29"}
+  },
+  lp1: {
+    all:   {cpl:"¥587",costFmt:"¥56,440",lineFmt:"96件",clicksFmt:"318",impFmt:"7,718",ctr:"CTR: 4.12%",cpc:"CPC: ¥177",period:"全期間"},
+    month: {cpl:"¥587",costFmt:"¥56,440",lineFmt:"96件",clicksFmt:"318",impFmt:"7,718",ctr:"CTR: 4.12%",cpc:"CPC: ¥177",period:"03/01〜03/29"},
+    week:  {cpl:"¥1,964",costFmt:"¥37,316",lineFmt:"19件",clicksFmt:"222",impFmt:"5,442",ctr:"CTR: 4.08%",cpc:"CPC: ¥168",period:"03/23〜03/29"}
+  },
+  lp2: {
+    all:   {cpl:"-",costFmt:"¥35,558",lineFmt:"0件",clicksFmt:"106",impFmt:"4,996",ctr:"CTR: 2.12%",cpc:"CPC: ¥335",period:"全期間"},
+    month: {cpl:"-",costFmt:"¥35,558",lineFmt:"0件",clicksFmt:"106",impFmt:"4,996",ctr:"CTR: 2.12%",cpc:"CPC: ¥335",period:"03/01〜03/29"},
+    week:  {cpl:"-",costFmt:"¥26,242",lineFmt:"0件",clicksFmt:"74",impFmt:"3,717",ctr:"CTR: 1.99%",cpc:"CPC: ¥354",period:"03/23〜03/29"}
+  },
+  lp3: {
+    all:   {cpl:"¥478",costFmt:"¥36,360",lineFmt:"76件",clicksFmt:"120",impFmt:"4,767",ctr:"CTR: 2.52%",cpc:"CPC: ¥303",period:"全期間"},
+    month: {cpl:"¥686",costFmt:"¥36,360",lineFmt:"53件",clicksFmt:"120",impFmt:"4,767",ctr:"CTR: 2.52%",cpc:"CPC: ¥303",period:"03/01〜03/29"},
+    week:  {cpl:"¥2,266",costFmt:"¥27,200",lineFmt:"12件",clicksFmt:"85",impFmt:"3,329",ctr:"CTR: 2.55%",cpc:"CPC: ¥320",period:"03/23〜03/29"}
+  },
+  lp4: {
+    all:   {cpl:"¥1,385",costFmt:"¥33,243",lineFmt:"24件",clicksFmt:"109",impFmt:"3,998",ctr:"CTR: 2.73%",cpc:"CPC: ¥304",period:"全期間"},
+    month: {cpl:"¥1,385",costFmt:"¥33,243",lineFmt:"24件",clicksFmt:"109",impFmt:"3,998",ctr:"CTR: 2.73%",cpc:"CPC: ¥304",period:"03/01〜03/29"},
+    week:  {cpl:"¥3,008",costFmt:"¥24,065",lineFmt:"8件",clicksFmt:"89",impFmt:"2,959",ctr:"CTR: 3.01%",cpc:"CPC: ¥270",period:"03/23〜03/29"}
   }
 };
 
-function switchPeriod(crId, period) {
-  const d = DATA[crId][period];
-  document.getElementById(crId + '-cpl').textContent = d.cpl;
-  document.getElementById(crId + '-cost').textContent = d.costFmt;
-  document.getElementById(crId + '-cost-sub').textContent = d.period;
-  document.getElementById(crId + '-line').textContent = d.lineFmt;
-  document.getElementById(crId + '-line-sub').textContent = d.period;
-  document.getElementById(crId + '-clicks').textContent = d.clicksFmt;
-  document.getElementById(crId + '-ctr').textContent = d.ctr;
-  document.getElementById(crId + '-imp').textContent = d.impFmt;
-  document.getElementById(crId + '-cpc').textContent = d.cpc;
+function switchPeriod(id, period) {
+  const d = DATA[id][period];
+  document.getElementById(id+'-cpl').textContent = d.cpl;
+  document.getElementById(id+'-cost').textContent = d.costFmt;
+  document.getElementById(id+'-cost-sub').textContent = d.period;
+  document.getElementById(id+'-line').textContent = d.lineFmt;
+  document.getElementById(id+'-line-sub').textContent = d.period;
+  document.getElementById(id+'-clicks').textContent = d.clicksFmt;
+  document.getElementById(id+'-ctr').textContent = d.ctr;
+  document.getElementById(id+'-imp').textContent = d.impFmt;
+  document.getElementById(id+'-cpc').textContent = d.cpc;
 }
 
 function showPage(id, el) {
@@ -665,6 +423,11 @@ function showPage(id, el) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   el.classList.add('active');
+}
+
+function toggleGroup(el) {
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('open');
 }
 </script>
 </body>
